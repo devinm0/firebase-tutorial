@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>Your Todos</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <h1>Welcome, <span id="userEmail"></span></h1>
+
+  <h2>Your Todos</h2>
+  <ul id="todoList"></ul>
+
+  <input type="text" id="todoTitle" placeholder="New todo">
+  <button onclick="addTodo()">Add</button>
+
+  <script>
+    // 🔑 Your config here
+    const firebaseConfig = {
+      apiKey: "AIzaSyAtuYiuQ6EeeIWem5P27g0YOYwoB7KfmfY",
+      authDomain: "devin-todo-53a76.firebaseapp.com",
+      projectId: "devin-todo-53a76",
+      storageBucket: "devin-todo-53a76.firebasestorage.app",
+      messagingSenderId: "829708154835",
+      appId: "1:829708154835:web:76419613cd608bf0cc6126",
+      measurementId: "G-FN99D2E906"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    // 🔒 Only run if user is logged in
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location = "index.html"; // Redirect to login if not logged in
+        return;
+      }
+
+      document.getElementById("userEmail").innerText = user.email;
+
+      // Realtime listener for todos
+      db.collection("todos")
+        .where("uid", "==", user.uid)
+        .orderBy("createdAt")
+        .onSnapshot(snapshot => {
+          const list = document.getElementById("todoList");
+          list.innerHTML = ""; // Clear list
+          snapshot.forEach(doc => {
+            const todo = doc.data();
+            const li = document.createElement("li");
+            li.innerText = todo.title + (todo.completed ? " ✅" : "");
+            list.appendChild(li);
+          });
+        });
+    });
+
+    function addTodo() {
+      const title = document.getElementById("todoTitle").value;
+      const user = auth.currentUser;
+      if (!user || !title) return;
+
+      db.collection("todos").add({
+        uid: user.uid,
+        title: title,
+        completed: false,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      document.getElementById("todoTitle").value = "";
+    }
+  </script>
+</body>
+</html>
