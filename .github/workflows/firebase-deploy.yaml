@@ -24,6 +24,9 @@ jobs:
       - name: Save Firebase service account key
         run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > $HOME/firebase-key.json
 
+      - name: Debug project ID
+        run: echo "Project ID is '${{ secrets.PROJECT_ID }}'"
+        
       - name: Deploy to Firebase Hosting
         env:
           GOOGLE_APPLICATION_CREDENTIALS: $HOME/firebase-key.json
