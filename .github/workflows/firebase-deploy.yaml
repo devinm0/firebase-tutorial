@@ -37,3 +37,4 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: $HOME/firebase-key.json
         run: firebase deploy --only hosting --project ${{ secrets.PROJECT_ID }}
 
+
