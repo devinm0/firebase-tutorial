@@ -26,8 +26,14 @@ jobs:
 
       - name: Debug project ID
         run: echo "Project ID is '${{ secrets.PROJECT_ID }}'"
-        
+
       - name: Deploy to Firebase Hosting
         env:
           GOOGLE_APPLICATION_CREDENTIALS: $HOME/firebase-key.json
         run: firebase deploy --only hosting --project ${{ secrets.PROJECT_ID }}
+
+      - name: Debug credential file exists
+        run: |
+          echo "Credential file exists?"; ls -la $HOME/firebase-key.json
+          echo "First few lines:"; head -n 5 $HOME/firebase-key.json
+
